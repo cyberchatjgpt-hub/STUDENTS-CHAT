@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Study Squad</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f0ff;--card:#fff;--text:#1d1733;--muted:#6a6486;--pri:#6d28d9;--onpri:#fff;--acc:#fcd34d;--onacc:#2b2000;--line:#e3dafb;--ok:#15803d;--soft:#ede7ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#120d22;--card:#1d1635;--text:#f3efff;--muted:#a79fc7;--pri:#a78bfa;--onpri:#1a0f3a;--acc:#fcd34d;--onacc:#2b2000;--line:#33295a;--ok:#4ade80;--soft:#2a2050}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#120d22;--card:#1d1635;--text:#f3efff;--muted:#a79fc7;--pri:#a78bfa;--onpri:#1a0f3a;--acc:#fcd34d;--onacc:#2b2000;--line:#33295a;--ok:#4ade80;--soft:#2a2050}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 "Trebuchet MS","Segoe UI",system-ui,sans-serif;min-height:100vh}
+#app{max-width:480px;margin:0 auto;padding:16px 16px 96px}
+h1,h2{font-family:"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;margin:0}
+h1{font-size:26px}h2{font-size:18px;margin-bottom:10px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.pts{background:var(--acc);color:var(--onacc);font-weight:800;border-radius:999px;padding:6px 14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;margin-bottom:14px}
+.hero{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
+.bar{height:14px;background:var(--soft);border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.hero .bar{background:rgba(255,255,255,.25)}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .5s}
+.muted{color:var(--muted);font-size:14px}.hero .muted{color:inherit;opacity:.85}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0}
+.row+.row{border-top:1px solid var(--line)}
+.av{width:44px;height:44px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:24px;position:relative;flex:none}
+.dot{position:absolute;right:-1px;bottom:-1px;width:14px;height:14px;border-radius:50%;border:2px solid var(--card)}
+.studying{background:#22c55e}.break{background:#f59e0b}.offline{background:#9ca3af}
+.grow{flex:1;min-width:0}.name{font-weight:700}
+button,select,input{font:inherit;color:inherit}
+.btn{border:0;border-radius:16px;padding:12px 18px;font-weight:800;background:var(--pri);color:var(--onpri);min-height:48px;cursor:pointer}
+.btn.acc{background:var(--acc);color:var(--onacc)}
+.btn.small{padding:8px 14px;min-height:40px;font-size:14px}
+.btn.ghost{background:var(--soft);color:var(--text)}
+.btn:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.clock{font-size:76px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;margin:12px 0;letter-spacing:-2px}
+.center{text-align:center}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--soft);font-size:13px;font-weight:700}
+.lb{font-weight:800;width:28px;text-align:center}
+.me{background:var(--soft);border-radius:14px;padding-left:8px;padding-right:8px}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:48vh;overflow-y:auto;padding:4px}
+.msg{max-width:84%;padding:9px 13px;border-radius:18px;background:var(--soft);align-self:flex-start;font-size:15px}
+.msg.mine{align-self:flex-end;background:var(--pri);color:var(--onpri)}
+.msg b{font-size:12px;display:block;opacity:.8}
+.rx{border:0;background:transparent;font-size:13px;cursor:pointer;padding:2px 0;color:inherit}
+.send{display:flex;gap:8px;margin-top:10px}
+.send input{flex:1;min-width:0;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:12px}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.badge{border:2px dashed var(--line);border-radius:18px;padding:12px;text-align:center;opacity:.5}
+.badge.on{opacity:1;border:2px solid var(--acc);background:var(--soft)}
+.badge span{font-size:30px;display:block}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:var(--card);border-top:2px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+.tabs div{display:flex;width:100%;max-width:480px}
+.tab{flex:1;border:0;background:transparent;padding:8px 2px;border-radius:14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
+.tab span{display:block;font-size:22px}
+.tab.on{color:var(--pri);background:var(--soft)}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-150%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:20;transition:transform .3s;max-width:90%;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+.conf{position:fixed;top:-20px;width:10px;height:14px;z-index:30;pointer-events:none;animation:fall 2.4s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+@media (prefers-reduced-motion:reduce){.conf{display:none}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div id="app"><div id="view"></div></div>
+<nav class="tabs"><div id="tabs"></div></nav>
+<div id="toast" role="status"></div>
+<script>
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY='studysquad-demo';
+const TARGET=450;
+const fresh=()=>({points:0,sessions:0,mins:0,streak:1,squadMins:400,done:false,badges:[],demo:true,
+ msgs:[{u:'Maya',t:'Library at 4? Let’s get a session in.',r:0},{u:'Leo',t:'I’m in. Bringing snacks 🍪',r:0}]});
+let S=fresh();
+try{const x=localStorage.getItem(KEY);if(x)S=Object.assign(fresh(),JSON.parse(x))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const members=[
+ {n:'Maya',a:'🦊',st:'studying',p:120},{n:'Leo',a:'🐼',st:'break',p:90},
+ {n:'Sam',a:'🐸',st:'offline',p:60},{n:'Zoe',a:'🦄',st:'studying',p:150}];
+const rivals=[['Brainiacs',910],['Quiet Storm',780],['Coffee Club',560],['Pixel Pals',430]];
+const BADGES=[['First Session','🌱','Finish 1 session'],['7-Day Streak','🔥','Study 7 days in a row'],['Squad MVP','👑','Reach 30 points'],['Challenge Champion','🏆','Complete a challenge']];
+let tab='home',T=null,timerId=null,myStatus='offline';
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2400)}
+function confetti(){const c=['#6d28d9','#fcd34d','#22c55e','#f472b6','#38bdf8'];for(let i=0;i<70;i++){const d=document.createElement('i');d.className='conf';d.style.left=Math.random()*100+'vw';d.style.background=c[i%5];d.style.animationDelay=Math.random()*.6+'s';d.style.animationDuration=1.8+Math.random()*1.4+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3500)}}
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+const stLabel={studying:'Studying',break:'On break',offline:'Offline'};
+
+function checkBadges(){
+ const earn=[S.sessions>=1,S.streak>=7,S.points>=30,S.done];
+ BADGES.forEach((b,i)=>{if(earn[i]&&!S.badges.includes(b[0])){S.badges.push(b[0]);toast(b[1]+' Badge unlocked: '+b[0])}});
+}
+function complete(){
+ clearInterval(timerId);T=null;myStatus='break';
+ S.sessions++;S.mins+=25;S.points+=10;S.squadMins+=25;
+ if(S.squadMins>=TARGET&&!S.done){S.done=true;S.points+=50;confetti();toast('🎉 Challenge complete! +50 points')}
+ else toast('Session complete! +10 points');
+ checkBadges();save();render();
+}
+function start(){
+ const dur=S.demo?10:1500;
+ T={end:Date.now()+dur*1000,dur};myStatus='studying';
+ timerId=setInterval(()=>{
+  const left=Math.max(0,Math.ceil((T.end-Date.now())/1000));
+  const el=document.getElementById('clock');if(el)el.textContent=fmt(left);
+  if(left<=0)complete();
+ },250);render();
+}
+function stop(msg){clearInterval(timerId);T=null;myStatus='offline';if(msg)toast(msg);render()}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&T)stop('Session cancelled: you left the app')});
+
+function home(){
+ const pct=Math.min(100,Math.round(S.squadMins/TARGET*100));
+ const total=members.reduce((a,m)=>a+m.p,0)+S.points;
+ const all=[{n:'You',a:'😎',st:myStatus,p:S.points},...members];
+ return `<div class="top"><div><h1>Night Owls 🦉</h1><div class="muted">${all.length} members · ${total} squad pts</div></div><div class="pts">⭐ ${S.points}</div></div>
+ <div class="card hero"><h2>Weekly challenge</h2><div>Squad studies ${Math.round(TARGET/60*10)/10} hours total</div>
+ <div class="bar"><i style="width:${pct}%"></i></div><div class="muted">${S.squadMins} / ${TARGET} min ${S.done?'· Done! 🏆':''}</div></div>
+ <div class="card"><h2>Your squad</h2>${all.map(m=>`<div class="row"><div class="av">${m.a}<span class="dot ${m.st}"></span></div>
+ <div class="grow"><div class="name">${esc(m.n)}</div><div class="muted">${stLabel[m.st]} · ${m.p} pts</div></div>
+ ${m.st==='offline'&&m.n!=='You'?`<button class="btn small ghost" data-nudge="${esc(m.n)}">👋 Nudge</button>`:''}</div>`).join('')}</div>
+ <button class="btn acc" style="width:100%" data-go="timer">Start a focus session</button>`;
+}
+function timer(){
+ const left=T?Math.max(0,Math.ceil((T.end-Date.now())/1000)):(S.demo?10:1500);
+ return `<div class="top"><h1>Focus timer</h1><div class="pts">⭐ ${S.points}</div></div>
+ <div class="card center"><span class="pill">${T?'🟢 Your squad can see you studying':'Ready when you are'}</span>
+ <div class="clock" id="clock">${fmt(left)}</div>
+ ${T?`<button class="btn ghost" data-stop>Stop session</button>`:`<button class="btn" data-start>Start ${S.demo?'10-second demo':'25-minute'} session</button>`}
+ <p class="muted">A session only counts if the timer finishes and you stay in the app.</p></div>
+ <div class="card"><label class="row" style="padding:0"><input type="checkbox" id="demo" ${S.demo?'checked':''} ${T?'disabled':''} style="width:22px;height:22px"><span class="grow">Demo mode (10 seconds instead of 25 minutes)</span></label></div>`;
+}
+function board(){
+ const list=[['Night Owls 🦉',members.reduce((a,m)=>a+m.p,0)+S.points+380,true],...rivals.map(r=>[r[0],r[1],false])].sort((a,b)=>b[1]-a[1]);
+ return `<div class="top"><h1>Leaderboard</h1></div><div class="card"><h2>Top squads this week</h2>
+ ${list.map((r,i)=>`<div class="row ${r[2]?'me':''}"><div class="lb">${['🥇','🥈','🥉'][i]||i+1}</div><div class="grow name">${esc(r[0])}</div><div class="name">${r[1]}</div></div>`).join('')}</div>`;
+}
+function chat(){
+ return `<div class="top"><h1>Squad chat</h1></div><div class="card"><div class="chat" id="chat">
+ ${S.msgs.map((m,i)=>`<div class="msg ${m.u==='You'?'mine':''}"><b>${esc(m.u)}</b>${esc(m.t)}<br><button class="rx" data-rx="${i}">${m.r?'❤️ '+m.r:'🤍'}</button></div>`).join('')}</div>
+ <div class="send"><input id="txt" placeholder="Message your squad" maxlength="200"><button class="btn" data-send>Send</button></div></div>`;
+}
+function profile(){
+ return `<div class="top"><h1>Your profile</h1><div class="pts">⭐ ${S.points}</div></div>
+ <div class="card"><div class="row" style="padding-top:0"><div class="av">😎</div><div class="grow"><div class="name">You</div><div class="muted">Night Owls</div></div></div>
+ <div class="badges" style="grid-template-columns:1fr 1fr 1fr"><div class="center"><div class="name">🔥 ${S.streak}</div><div class="muted">day streak</div></div>
+ <div class="center"><div class="name">${S.sessions}</div><div class="muted">sessions</div></div>
+ <div class="center"><div class="name">${(S.mins/60).toFixed(1)}h</div><div class="muted">studied</div></div></div></div>
+ <div class="card"><h2>Badges</h2><div class="badges">${BADGES.map(b=>`<div class="badge ${S.badges.includes(b[0])?'on':''}"><span>${b[1]}</span><div class="name">${b[0]}</div><div class="muted">${b[2]}</div></div>`).join('')}</div></div>
+ <button class="btn ghost" style="width:100%" data-reset>Reset demo</button>`;
+}
+const views={home,timer,board,chat,profile};
+const tabsDef=[['home','🏠','Squad'],['timer','⏱️','Focus'],['board','🏆','Ranks'],['chat','💬','Chat'],['profile','😎','Me']];
+function render(){
+ document.getElementById('view').innerHTML=views[tab]();
+ document.getElementById('tabs').innerHTML=tabsDef.map(t=>`<button class="tab ${t[0]===tab?'on':''}" data-go="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('');
+ const c=document.getElementById('chat');if(c)c.scrollTop=c.scrollHeight;
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('button,[data-go]');if(!b)return;
+ const d=b.dataset;
+ if(d.go){tab=d.go;render()}
+ else if(d.start!==undefined)start();
+ else if(d.stop!==undefined)stop('Session stopped. No points this time.');
+ else if(d.nudge){toast('👋 Nudge sent to '+d.nudge)}
+ else if(d.rx!==undefined){const m=S.msgs[+d.rx];m.r=m.r?0:1;save();render()}
+ else if(d.send!==undefined)send();
+ else if(d.reset!==undefined){S=fresh();save();myStatus='offline';render();toast('Demo reset')}
+});
+document.addEventListener('change',e=>{if(e.target.id==='demo'){S.demo=e.target.checked;save();render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='txt')send()});
+function send(){
+ const i=document.getElementById('txt');const v=i.value.trim();if(!v)return;
+ S.msgs.push({u:'You',t:v,r:0});save();render();
+ const lines=['Love it 🔥','Let’s go!','Same, starting a session now','Don’t forget our challenge 💪'];
+ setTimeout(()=>{S.msgs.push({u:members[Math.floor(Math.random()*4)].n,t:lines[Math.floor(Math.random()*lines.length)],r:0});save();if(tab==='chat')render()},1300);
+}
+setInterval(()=>{
+ const m=members[Math.floor(Math.random()*members.length)];
+ const o=['studying','break','offline'];m.st=o[Math.floor(Math.random()*3)];
+ if(tab==='home'&&!T)render();
+},7000);
+render();
+</script>
+</body>
+</html>
